@@ -5,6 +5,8 @@ package com.cmaykish.conway;
  * ---
  * The board is represented by a 2D array of cells and each cell is an integer 1 (alive) or 0 (dead).
  *
+ * Height and width is determined by the starting board size.
+ *
  * The starting state is processed based on the rules of the game and the state after one
  * step is generated and displayed.
  *
@@ -12,44 +14,47 @@ package com.cmaykish.conway;
  * 9/29/2015
  */
 public class Game {
-    private static final int ROWS = 6;      // HEIGHT
-    private static final int COLUMNS = 8;   // WIDTH
+    private int rows = 0;      // HEIGHT
+    private int columns = 0;   // WIDTH
 
     private int[][] currentState;   // Current state of the board
     private int[][] nextState;      // Next state of the board, where the updates take place
 
-    private int[][] sampleBoard = { // Sample board given in assignment
-            {0,0,0,0,0,0,1,0},
-            {1,1,1,0,0,0,1,0},
-            {0,0,0,0,0,0,1,0},
-            {0,0,0,0,0,0,0,0},
-            {0,0,0,1,1,0,0,0},
-            {0,0,0,1,1,0,0,0}
-    };
+    /**
+     *
+     * @param startingBoard 2D array of integers. Must only include 1's and 0's
+     */
+    public Game(int[][] startingBoard){
 
-    public Game(){
-        init();
+        // Quick check to make sure the starting board is valid
+        for (int[] i : startingBoard){
+            for (int j : i){
+                if (j < 0 || j > 1){
+                    System.err.println("Board contains invalid cells. Cells must be 1 or 0 only.");
+                    System.exit(1);
+                }
+            }
+        }
+
+        currentState = startingBoard;
+
+        rows = startingBoard.length;
+
+        if (rows > 0){
+            columns = startingBoard[0].length;
+        }
+
+        nextState = new int[rows][columns];
     }
 
-    // Begin running the game
-    public void run(){
-        System.out.println("Initial state:");
-        display();
-        step();
-        System.out.println("Next state:");
-        display();
-    }
-
-    // Instantiate the game state variables and get ready for the first step
-    private void init(){
-        currentState = sampleBoard;
-        nextState = new int[ROWS][COLUMNS];
-    }
-
-    // Process each cell on the board and update its status based on the rules of the game
-    private void step(){
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLUMNS; j++) {
+    /**
+     * Process each cell on the board based on the rules of the game and update status accordingly.
+     *
+     * @return Board state after moving forward one step.
+     */
+    public int[][] step(){
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 // Count the cell's living neighbors
                 int livingNeighbors = countLivingNeighbors(currentState, i, j);
 
@@ -70,7 +75,9 @@ public class Game {
 
         // Once the next board state has been determined, set it to the current state and reset the next state array
         currentState = nextState;
-        nextState = new int[ROWS][COLUMNS];
+        nextState = new int[rows][columns];
+
+        return currentState;
     }
 
      /*
@@ -92,8 +99,8 @@ public class Game {
                 if (
                         x + i >= 0 &&       // Neighbor plus offset should be above zero in the x-direction
                         y + j >= 0 &&       // Neighbor plus offset should be above zero in the y-direction
-                        x + i < ROWS &&     // Neighbor plus offset should be below the height of the board
-                        y + j < COLUMNS &&  // Neighbor plus offset should be below the width of the board
+                        x + i < rows &&     // Neighbor plus offset should be below the height of the board
+                        y + j < columns &&  // Neighbor plus offset should be below the width of the board
                         !(i==0 && j ==0)    // Don't consider the cell its own neighbor
                 ){
                     living += board[x+i][y+j];  // If the neighbor is on the board, add its state to the living count
@@ -105,13 +112,14 @@ public class Game {
     }
 
     // Render the game state to the console
-    private void display(){
-        for (int i = 0; i < ROWS; i++){
-            for (int j = 0; j < COLUMNS; j++){
+    public void display(){
+        for (int i = 0; i < rows; i++){
+            for (int j = 0; j < columns; j++){
                 String cell = currentState[i][j] == 1 ? "O" : ".";
                 System.out.print(cell);
             }
             System.out.println("");
         }
+        System.out.println("");
     }
 }
