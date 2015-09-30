@@ -26,6 +26,7 @@ public class Game {
      */
     public Game(int[][] startingBoard){
 
+        // Quick check to make sure board is valid
         for (int[] i : startingBoard){
             for (int j : i){
                 if (j < 0 || j > 1){
@@ -34,7 +35,6 @@ public class Game {
                 }
             }
         }
-
 
         currentState = startingBoard;
 
